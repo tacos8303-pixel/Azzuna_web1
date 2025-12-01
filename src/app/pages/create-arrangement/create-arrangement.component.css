@@ -1,0 +1,247 @@
+.create-arrangement-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  color: #c82a54;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+h3 {
+  color: #333;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.form-section {
+  margin-bottom: 25px;
+}
+
+/* Style Selector */
+.style-selector {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.style-card {
+  width: 150px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+.style-card:hover {
+  border-color: #c82a54;
+  box-shadow: 0 0 10px rgba(200, 42, 84, 0.2);
+}
+
+.style-card.selected {
+  border-color: #c82a54;
+  box-shadow: 0 0 15px rgba(200, 42, 84, 0.4);
+  background-color: #fdf2f5;
+}
+
+.style-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.style-card p {
+  margin: 0;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Size Selector */
+.size-selector {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.size-selector .btn {
+  min-width: 120px;
+  font-size: 1rem;
+}
+
+/* Color Palette Selector */
+.color-palette-selector {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.color-option {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 3px solid transparent;
+}
+
+.color-option:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+  border-color: #c82a54;
+  box-shadow: 0 0 15px rgba(200, 42, 84, 0.6);
+  transform: scale(1.08);
+}
+
+/* Specific colors */
+.color-reds { background: linear-gradient(45deg, #FF0000, #C82A54); }
+.color-pastels { background: linear-gradient(45deg, #FFD1DC, #B2EBF2); }
+.color-vivid { background: linear-gradient(45deg, #FFEB3B, #00BCD4); }
+
+
+/* Extras Selector */
+.extras-selector {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.extra-card {
+  width: 120px;
+  height: 80px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.extra-card:hover {
+  border-color: #c82a54;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.extra-card.selected {
+  border-color: #c82a54;
+  background-color: #fdf2f5;
+  box-shadow: 0 0 15px rgba(200, 42, 84, 0.4);
+}
+
+.extra-card p {
+  margin: 0;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Dedication Input */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* Total Summary */
+.total-summary {
+  text-align: right;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.total-summary h4 {
+  font-size: 1.8rem;
+  color: #c82a54;
+  margin: 0;
+}
+
+/* Button */
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #fff;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-block {
+  display: block;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 8px 15px;
+  margin-top: 5px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* NGX-Bootstrap button overrides */
+.btn.btn-outline-primary {
+    color: #c82a54;
+    border-color: #c82a54;
+}
+
+.btn.btn-outline-primary:hover {
+    background-color: #c82a54;
+    color: #fff;
+}
+
+.btn.btn-primary {
+    background-color: #c82a54;
+    border-color: #c82a54;
+    color: #fff;
+}
+
+.btn.btn-primary:hover {
+    background-color: #a02142;
+    border-color: #a02142;
+}

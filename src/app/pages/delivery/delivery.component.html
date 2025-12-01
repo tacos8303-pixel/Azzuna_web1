@@ -1,0 +1,114 @@
+<div class="delivery-container">
+  <h2>Detalles de Entrega</h2>
+
+  <form [formGroup]="deliveryForm" (ngSubmit)="onSubmit()">
+    <!-- Input Fecha -->
+    <div class="form-group">
+      <label for="deliveryDate">Fecha de Entrega</label>
+      <input
+        type="text"
+        id="deliveryDate"
+        class="form-control"
+        placeholder="DD/MM/YYYY"
+        bsDatepicker
+        [bsConfig]="bsConfig"
+        formControlName="deliveryDate"
+        [class.is-invalid]="deliveryForm.get('deliveryDate')?.invalid && deliveryForm.get('deliveryDate')?.touched"
+      />
+      <div *ngIf="deliveryForm.get('deliveryDate')?.invalid && deliveryForm.get('deliveryDate')?.touched" class="invalid-feedback">
+        La fecha de entrega es requerida.
+      </div>
+    </div>
+
+    <!-- Input Horario -->
+    <div class="form-group">
+      <label for="deliveryTime">Horario de Entrega</label>
+      <input
+        type="time"
+        id="deliveryTime"
+        class="form-control"
+        formControlName="deliveryTime"
+        [class.is-invalid]="deliveryForm.get('deliveryTime')?.invalid && deliveryForm.get('deliveryTime')?.touched"
+      />
+      <div *ngIf="deliveryForm.get('deliveryTime')?.invalid && deliveryForm.get('deliveryTime')?.touched" class="invalid-feedback">
+        El horario de entrega es requerido.
+      </div>
+    </div>
+
+    <!-- Dirección + Ciudad + Código Postal -->
+    <div class="form-group">
+      <label for="address">Dirección</label>
+      <input
+        type="text"
+        id="address"
+        class="form-control"
+        formControlName="address"
+        placeholder="Calle, número, colonia"
+        [class.is-invalid]="deliveryForm.get('address')?.invalid && deliveryForm.get('address')?.touched"
+      />
+      <div *ngIf="deliveryForm.get('address')?.invalid && deliveryForm.get('address')?.touched" class="invalid-feedback">
+        La dirección es requerida.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="city">Ciudad</label>
+      <input
+        type="text"
+        id="city"
+        class="form-control"
+        formControlName="city"
+        [class.is-invalid]="deliveryForm.get('city')?.invalid && deliveryForm.get('city')?.touched"
+      />
+      <div *ngIf="deliveryForm.get('city')?.invalid && deliveryForm.get('city')?.touched" class="invalid-feedback">
+        La ciudad es requerida.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="postalCode">Código Postal</label>
+      <input
+        type="text"
+        id="postalCode"
+        class="form-control"
+        formControlName="postalCode"
+        [class.is-invalid]="deliveryForm.get('postalCode')?.invalid && deliveryForm.get('postalCode')?.touched"
+      />
+      <div *ngIf="deliveryForm.get('postalCode')?.invalid && deliveryForm.get('postalCode')?.touched" class="invalid-feedback">
+        <span *ngIf="deliveryForm.get('postalCode')?.errors?.['required']">El código postal es requerido.</span>
+        <span *ngIf="deliveryForm.get('postalCode')?.errors?.['pattern']">El formato del código postal es inválido.</span>
+      </div>
+    </div>
+
+    <!-- Switch "¿Es sorpresa?" -->
+    <div class="form-group form-check switch-container">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        id="isSurprise"
+        formControlName="isSurprise"
+      />
+      <label class="form-check-label" for="isSurprise">¿Es sorpresa?</label>
+    </div>
+
+    <!-- Textarea para instrucciones -->
+    <div class="form-group">
+      <label for="instructions">Instrucciones Adicionales (Opcional)</label>
+      <textarea
+        id="instructions"
+        class="form-control"
+        formControlName="instructions"
+        rows="3"
+        maxlength="500"
+        [class.is-invalid]="deliveryForm.get('instructions')?.invalid && deliveryForm.get('instructions')?.touched"
+      ></textarea>
+      <div *ngIf="deliveryForm.get('instructions')?.invalid && deliveryForm.get('instructions')?.touched" class="invalid-feedback">
+        Las instrucciones no pueden exceder los 500 caracteres.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" [disabled]="deliveryForm.invalid">
+      Continuar a Destinatario
+    </button>
+  </form>
+</div>

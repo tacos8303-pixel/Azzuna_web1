@@ -1,0 +1,38 @@
+<div class="pickups-container">
+  <h2>Pedidos por Recoger</h2>
+
+  <div class="list-group">
+    <div class="list-group-item" *ngFor="let order of pickupOrders">
+      <div class="order-info">
+        <h5 class="order-id">Pedido #{{ order.id }}</h5>
+        <p class="client-id">Cliente ID: {{ order.client_id }}</p>
+        <p class="delivery-date">Fecha de Entrega: {{ order.delivery_date | date:'fullDate' }}</p>
+      </div>
+      <div class="order-status">
+        <span class="badge" [ngClass]="{'badge-danger': order.payment_status === 'pending', 'badge-success': order.payment_status === 'paid'}">
+          {{ order.payment_status === 'pending' ? 'Pago Pendiente' : 'Pagado' }}
+        </span>
+      </div>
+      <div class="order-actions">
+        <button class="btn btn-icon" (click)="printOrder(order.id)" title="Imprimir Ticket">
+          <i class="icon-print"></i> <!-- Placeholder for print icon, using text instead -->
+          &#128424;
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-icon" title="Más Opciones">
+            <i class="icon-options"></i> <!-- Placeholder for options icon, using text instead -->
+            &#8942;
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" (click)="markAsPickedUp(order)">Marcar como Recogido</a>
+            <a class="dropdown-item" routerLink="/pedidos">Ver Detalles del Pedido</a>
+            <a class="dropdown-item" href="#">Contactar Cliente</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!pickupOrders || pickupOrders.length === 0" class="list-group-item text-center">
+      No hay pedidos por recoger en este momento.
+    </div>
+  </div>
+</div>

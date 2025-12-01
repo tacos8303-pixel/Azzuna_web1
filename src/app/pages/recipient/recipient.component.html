@@ -1,0 +1,89 @@
+<div class="recipient-container">
+  <h2>Datos del Destinatario</h2>
+
+  <form [formGroup]="recipientForm" (ngSubmit)="onSubmit()">
+    <!-- Nombre completo -->
+    <div class="form-group">
+      <label for="fullName">Nombre Completo</label>
+      <input
+        type="text"
+        id="fullName"
+        class="form-control"
+        formControlName="fullName"
+        [class.is-invalid]="recipientForm.get('fullName')?.invalid && recipientForm.get('fullName')?.touched"
+      />
+      <div *ngIf="recipientForm.get('fullName')?.invalid && recipientForm.get('fullName')?.touched" class="invalid-feedback">
+        El nombre completo es requerido.
+      </div>
+    </div>
+
+    <!-- Teléfono -->
+    <div class="form-group">
+      <label for="phone">Teléfono</label>
+      <input
+        type="tel"
+        id="phone"
+        class="form-control"
+        formControlName="phone"
+        placeholder="Ej: 5512345678"
+        [class.is-invalid]="recipientForm.get('phone')?.invalid && recipientForm.get('phone')?.touched"
+      />
+      <div *ngIf="recipientForm.get('phone')?.invalid && recipientForm.get('phone')?.touched" class="invalid-feedback">
+        <span *ngIf="recipientForm.get('phone')?.errors?.['required']">El teléfono es requerido.</span>
+        <span *ngIf="recipientForm.get('phone')?.errors?.['pattern']">El formato del teléfono es inválido (10 dígitos).</span>
+      </div>
+    </div>
+
+    <!-- Dirección (calle/número) -->
+    <div class="form-group">
+      <label for="address">Dirección</label>
+      <input
+        type="text"
+        id="address"
+        class="form-control"
+        formControlName="address"
+        placeholder="Calle y número"
+        [class.is-invalid]="recipientForm.get('address')?.invalid && recipientForm.get('address')?.touched"
+      />
+      <div *ngIf="recipientForm.get('address')?.invalid && recipientForm.get('address')?.touched" class="invalid-feedback">
+        La dirección es requerida.
+      </div>
+    </div>
+
+    <!-- Detalles adicionales -->
+    <div class="form-group">
+      <label for="additionalDetails">Detalles Adicionales (Opcional)</label>
+      <textarea
+        id="additionalDetails"
+        class="form-control"
+        formControlName="additionalDetails"
+        rows="3"
+        maxlength="500"
+        [class.is-invalid]="recipientForm.get('additionalDetails')?.invalid && recipientForm.get('additionalDetails')?.touched"
+      ></textarea>
+      <div *ngIf="recipientForm.get('additionalDetails')?.invalid && recipientForm.get('additionalDetails')?.touched" class="invalid-feedback">
+        Los detalles adicionales no pueden exceder los 500 caracteres.
+      </div>
+    </div>
+
+    <!-- Mensaje para tarjeta -->
+    <div class="form-group">
+      <label for="cardMessage">Mensaje para Tarjeta (Opcional)</label>
+      <textarea
+        id="cardMessage"
+        class="form-control"
+        formControlName="cardMessage"
+        rows="3"
+        maxlength="250"
+        [class.is-invalid]="recipientForm.get('cardMessage')?.invalid && recipientForm.get('cardMessage')?.touched"
+      ></textarea>
+      <div *ngIf="recipientForm.get('cardMessage')?.invalid && recipientForm.get('cardMessage')?.touched" class="invalid-feedback">
+        El mensaje para la tarjeta no puede exceder los 250 caracteres.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" [disabled]="recipientForm.invalid">
+      Continuar a Pago
+    </button>
+  </form>
+</div>

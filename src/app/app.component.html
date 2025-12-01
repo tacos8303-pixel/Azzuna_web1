@@ -1,0 +1,28 @@
+<div class="app-layout">
+  <aside class="sidebar">
+    <header class="sidebar-header">
+      <h1 class="sidebar-title">Azzuna Web</h1>
+    </header>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <!-- Add icon here later e.g. <i class="bi bi-grid-fill"></i> -->
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/crear-arreglo" routerLinkActive="active">
+        <!-- Add icon here later e.g. <i class="bi bi-plus-circle-fill"></i> -->
+        <span>Crear Arreglo</span>
+      </a>
+      <a routerLink="/pedidos" routerLinkActive="active">
+        <!-- Add icon here later e.g. <i class="bi bi-list-ul"></i> -->
+        <span>Pedidos</span>
+      </a>
+      <a routerLink="/por-recoger" routerLinkActive="active">
+        <!-- Add icon here later e.g. <i class="bi bi-bag-check-fill"></i> -->
+        <span>Por Recoger</span>
+      </a>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

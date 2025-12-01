@@ -1,0 +1,88 @@
+<div class="payment-container">
+  <h2>Confirmación y Pago</h2>
+
+  <div class="order-summary card">
+    <div class="card-body">
+      <h5 class="card-title">Resumen del Pedido</h5>
+      <p><strong>Arreglo:</strong> {{ orderSummary.arrangementDetails }}</p>
+      <p><strong>Entrega:</strong> {{ orderSummary.deliveryInfo }}</p>
+      <p><strong>Destinatario:</strong> {{ orderSummary.recipientInfo }}</p>
+      <hr>
+      <h4>Total a Pagar: <span class="total-amount">${{ orderSummary.total }}</span></h4>
+    </div>
+  </div>
+
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <h3>Selecciona Método de Pago</h3>
+    <div class="form-group">
+      <select
+        class="form-control"
+        formControlName="selectedPaymentMethod"
+        [class.is-invalid]="paymentForm.get('selectedPaymentMethod')?.invalid && paymentForm.get('selectedPaymentMethod')?.touched"
+      >
+        <option value="">Selecciona un método de pago</option>
+        <option *ngFor="let method of paymentMethods" [value]="method.value">
+          {{ method.name }}
+        </option>
+      </select>
+      <div *ngIf="paymentForm.get('selectedPaymentMethod')?.invalid && paymentForm.get('selectedPaymentMethod')?.touched" class="invalid-feedback">
+        El método de pago es requerido.
+      </div>
+    </div>
+
+    <!-- Conditional fields for Card Payment -->
+    <ng-container *ngIf="paymentForm.get('selectedPaymentMethod')?.value === 'card'">
+      <div class="form-group">
+        <label for="cardNumber">Número de Tarjeta</label>
+        <input
+          type="text"
+          id="cardNumber"
+          class="form-control"
+          formControlName="cardNumber"
+          placeholder="XXXX XXXX XXXX XXXX"
+          [class.is-invalid]="paymentForm.get('cardNumber')?.invalid && paymentForm.get('cardNumber')?.touched"
+        />
+        <div *ngIf="paymentForm.get('cardNumber')?.invalid && paymentForm.get('cardNumber')?.touched" class="invalid-feedback">
+          <span *ngIf="paymentForm.get('cardNumber')?.errors?.['required']">El número de tarjeta es requerido.</span>
+          <span *ngIf="paymentForm.get('cardNumber')?.errors?.['pattern']">Número de tarjeta inválido (16 dígitos).</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="expiryDate">Fecha de Vencimiento (MM/AA)</label>
+          <input
+            type="text"
+            id="expiryDate"
+            class="form-control"
+            formControlName="expiryDate"
+            placeholder="MM/AA"
+            [class.is-invalid]="paymentForm.get('expiryDate')?.invalid && paymentForm.get('expiryDate')?.touched"
+          />
+          <div *ngIf="paymentForm.get('expiryDate')?.invalid && paymentForm.get('expiryDate')?.touched" class="invalid-feedback">
+            <span *ngIf="paymentForm.get('expiryDate')?.errors?.['required']">La fecha de vencimiento es requerida.</span>
+            <span *ngIf="paymentForm.get('expiryDate')?.errors?.['pattern']">Formato inválido (MM/AA).</span>
+          </div>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="cvc">CVC</label>
+          <input
+            type="text"
+            id="cvc"
+            class="form-control"
+            formControlName="cvc"
+            placeholder="XXX o XXXX"
+            [class.is-invalid]="paymentForm.get('cvc')?.invalid && paymentForm.get('cvc')?.touched"
+          />
+          <div *ngIf="paymentForm.get('cvc')?.invalid && paymentForm.get('cvc')?.touched" class="invalid-feedback">
+            <span *ngIf="paymentForm.get('cvc')?.errors?.['required']">El CVC es requerido.</span>
+            <span *ngIf="paymentForm.get('cvc')?.errors?.['pattern']">CVC inválido (3 o 4 dígitos).</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <button type="submit" class="btn btn-success btn-block" [disabled]="paymentForm.invalid">
+      Confirmar Pedido y Pagar
+    </button>
+  </form>
+</div>

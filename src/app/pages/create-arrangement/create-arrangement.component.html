@@ -1,0 +1,106 @@
+<div class="create-arrangement-container">
+  <h2>Crea tu Arreglo</h2>
+
+  <form [formGroup]="arrangementForm" (ngSubmit)="onSubmit()">
+    <!-- Selector de Estilo -->
+    <section class="form-section">
+      <h3>1. Selecciona el Estilo</h3>
+      <div class="style-selector">
+        <div
+          class="style-card"
+          *ngFor="let style of styles"
+          [class.selected]="arrangementForm.get('selectedStyle')?.value === style.value"
+          (click)="selectStyle(style.value)"
+        >
+          <!-- Placeholder for images, you'd place them in src/assets/ -->
+          <img src="assets/placeholder-{{style.value}}.jpg" [alt]="style.name" />
+          <p>{{ style.name }}</p>
+        </div>
+      </div>
+      <div *ngIf="arrangementForm.get('selectedStyle')?.invalid && (arrangementForm.get('selectedStyle')?.dirty || arrangementForm.get('selectedStyle')?.touched)" class="alert alert-danger mt-2">
+        El estilo es requerido.
+      </div>
+    </section>
+
+    <!-- Selector de Tamaño -->
+    <section class="form-section">
+      <h3>2. Elige el Tamaño</h3>
+      <div class="size-selector">
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="arrangementForm.get('selectedSize')?.value === size.value"
+          [class.btn-outline-primary]="arrangementForm.get('selectedSize')?.value !== size.value"
+          *ngFor="let size of sizes"
+          (click)="selectSize(size.value)"
+        >
+          {{ size.name }} (${{ size.price }})
+        </button>
+      </div>
+      <div *ngIf="arrangementForm.get('selectedSize')?.invalid && (arrangementForm.get('selectedSize')?.dirty || arrangementForm.get('selectedSize')?.touched)" class="alert alert-danger mt-2">
+        El tamaño es requerido.
+      </div>
+    </section>
+
+    <!-- Selector de Paleta de Colores -->
+    <section class="form-section">
+      <h3>3. Define la Paleta de Colores</h3>
+      <div class="color-palette-selector">
+        <div
+          class="color-option"
+          [class]="color.class"
+          [class.selected]="arrangementForm.get('selectedColorPalette')?.value === color.value"
+          *ngFor="let color of colorPalettes"
+          (click)="selectColorPalette(color.value)"
+        >
+          <span>{{ color.name }}</span>
+        </div>
+      </div>
+      <div *ngIf="arrangementForm.get('selectedColorPalette')?.invalid && (arrangementForm.get('selectedColorPalette')?.dirty || arrangementForm.get('selectedColorPalette')?.touched)" class="alert alert-danger mt-2">
+        La paleta de colores es requerida.
+      </div>
+    </section>
+
+    <!-- Extras (Checkbox estilo cards) -->
+    <section class="form-section">
+      <h3>4. Agrega Extras</h3>
+      <div formArrayName="selectedExtras" class="extras-selector">
+        <div
+          class="extra-card"
+          *ngFor="let extra of extras; let i = index"
+          [class.selected]="selectedExtras.at(i).value"
+          (click)="toggleExtra(i)"
+        >
+          <input type="checkbox" [formControl]="getExtraControl(i)" hidden />
+          <p>{{ extra.name }} (${{ extra.price }})</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Input de Dedicatoria -->
+    <section class="form-section">
+      <h3>5. Escribe tu Dedicatoria</h3>
+      <div class="form-group">
+        <textarea
+          formControlName="dedication"
+          class="form-control"
+          placeholder="Escribe aquí tu dedicatoria (máx. 250 caracteres)"
+          rows="3"
+          maxlength="250"
+        ></textarea>
+        <div *ngIf="arrangementForm.get('dedication')?.invalid && (arrangementForm.get('dedication')?.dirty || arrangementForm.get('dedication')?.touched)" class="alert alert-danger mt-2">
+          La dedicatoria no puede exceder los 250 caracteres.
+        </div>
+      </div>
+    </section>
+
+    <!-- Cálculo Dinámico del Total -->
+    <div class="total-summary">
+      <h4>Total: ${{ totalAmount }}</h4>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-block" [disabled]="arrangementForm.invalid">
+      Continuar a Entrega
+    </button>
+  </form>
+</div>
