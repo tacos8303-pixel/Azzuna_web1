@@ -4,30 +4,36 @@ import { Observable } from 'rxjs';
 import { Order } from '../models/order.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class OrdersService {
-  private API = 'http://localhost/azzuna_api/';
+
+  private baseUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
+  // GET ALL
   getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.API + 'orders_get.php');
+    return this.http.get<Order[]>(`${this.baseUrl}/orders`);
   }
 
-  getOrder(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.API}orders_get.php?id=${id}`);
+  // GET BY ID
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.baseUrl}/orders/${id}`);
   }
 
-  createOrder(data: Order): Observable<any> {
-    return this.http.post(this.API + 'orders_create.php', data);
+  // CREATE
+  createOrder(data: Partial<Order>): Observable<Order> {
+    return this.http.post<Order>(`${this.baseUrl}/orders`, data);
   }
 
-  updateOrder(id: number, data: Order): Observable<any> {
-    return this.http.put(`${this.API}orders_update.php?id=${id}`, data);
+  // UPDATE
+  updateOrder(id: number, data: Partial<Order>): Observable<Order> {
+    return this.http.put<Order>(`${this.baseUrl}/orders/${id}`, data);
   }
 
-  deleteOrder(id: number): Observable<any> {
-    return this.http.delete(`${this.API}orders_delete.php?id=${id}`);
+  // DELETE
+  deleteOrder(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/orders/${id}`);
   }
 }

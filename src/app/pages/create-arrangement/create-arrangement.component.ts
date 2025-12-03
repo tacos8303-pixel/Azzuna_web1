@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, FormControl, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { OrderBuilderService } from '../../core/services/order-builder.service';
 import { Arrangement } from '../../core/models/arrangement.model'; // Assuming the model is here
 import { CommonModule } from '@angular/common';
 
@@ -36,7 +37,7 @@ export class CreateArrangementComponent implements OnInit {
 
   totalAmount: number = 0;
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(private fb: FormBuilder, private router: Router, private orderBuilderService: OrderBuilderService) {}
 
   ngOnInit(): void {
     this.arrangementForm = this.fb.group({
@@ -106,6 +107,9 @@ export class CreateArrangementComponent implements OnInit {
       // You would typically send this data to a service
       console.log('Arrangement Data:', this.arrangementForm.value);
       console.log('Total Amount:', this.totalAmount);
+      this.orderBuilderService.setArrangementData({
+        total_amount: this.totalAmount
+      });
       // Navigate to the next step
       this.router.navigate(['/entrega']);
     } else {

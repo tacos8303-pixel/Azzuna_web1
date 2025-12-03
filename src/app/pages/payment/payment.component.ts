@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Order } from '../../core/models/order.model';
 
 @Component({
   selector: 'app-payment',
@@ -17,14 +18,10 @@ export class PaymentComponent implements OnInit {
     { name: 'PayPal', value: 'paypal' },
     { name: 'Transferencia Bancaria', value: 'bank_transfer' },
   ];
-  orderSummary = {
-    arrangementDetails: 'Arreglo Clásico, Mediano, Paleta Rojos, con Tarjeta y Chocolates', // Mock data
-    total: 200 + 20 + 30, // Example total from previous step
-    deliveryInfo: 'Entrega el 30/11/2025 a las 14:00 en Calle Falsa 123', // Mock data
-    recipientInfo: 'Destinatario: Jane Doe, Tel: 5512345678', // Mock data
-  };
+  orderSummary: Partial<Order> | null = null;
+  currentOrder: Order | null = null; // New property to hold the full order object
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(private fb: FormBuilder, private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.paymentForm = this.fb.group({
@@ -33,6 +30,42 @@ export class PaymentComponent implements OnInit {
       expiryDate: [''],
       cvc: ['']
     });
+
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state?.['order']) {
+      this.currentOrder = navigation.extras.state['order'] as Order;
+      // Populate orderSummary ensuring all template-expected fields have values
+      this.orderSummary = {
+        id: this.currentOrder.id ?? 0, // Default to 0 if null
+        client_id: this.currentOrder.client_id ?? 0,
+        arrangement_id: this.currentOrder.arrangement_id ?? 0,
+        delivery_date: this.currentOrder.delivery_date ?? new Date().toISOString().slice(0,10),
+        total_amount: this.currentOrder.total_amount ?? 0,
+        payment_status: this.currentOrder.payment_status ?? 'pending',
+        status: this.currentOrder.status ?? 'pending',
+        recipient_name: this.currentOrder.recipient_name ?? 'N/A',
+        recipient_phone: this.currentOrder.recipient_phone ?? 'N/A',
+        recipient_address: this.currentOrder.recipient_address ?? 'N/A',
+        notes: this.currentOrder.notes ?? ''
+      };
+    } else {
+      console.warn('No order data found for payment confirmation. Displaying mock data.');
+      // Fallback to mock data if no order is passed
+      this.currentOrder = { // Populate currentOrder directly
+        id: 999,
+        client_id: 1,
+        arrangement_id: 1,
+        delivery_date: '2025-12-31',
+        total_amount: 1000,
+        payment_status: 'pending',
+        status: 'pending',
+        recipient_name: 'Mock Recipient',
+        recipient_phone: '1234567890',
+        recipient_address: 'Mock Address 123',
+        notes: 'Mock notes for testing.'
+      } as Order; // Cast to Order type
+      this.orderSummary = { ...this.currentOrder }; // Populate orderSummary from currentOrder
+    }
 
     // Conditional validation for card details
     this.paymentForm.get('selectedPaymentMethod')?.valueChanges.subscribe(method => {
@@ -59,7 +92,6 @@ export class PaymentComponent implements OnInit {
 
   onSubmit(): void {
     if (this.paymentForm.valid) {
-      console.log('Payment Data:', this.paymentForm.value);
       // Here you would integrate with a payment gateway (e.g., call a service)
       alert('¡Pedido realizado con éxito!'); // Simple alert for now
       this.router.navigate(['/dashboard']); // Redirect to dashboard or order confirmation page

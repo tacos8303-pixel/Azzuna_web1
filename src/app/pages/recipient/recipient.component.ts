@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { OrderBuilderService } from '../../core/services/order-builder.service';
+import { OrdersService } from '../../core/services/orders.service';
+import { Order } from '../../core/models/order.model';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,7 +16,12 @@ import { CommonModule } from '@angular/common';
 export class RecipientComponent implements OnInit {
   recipientForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private orderBuilderService: OrderBuilderService,
+    private ordersService: OrdersService
+  ) {}
 
   ngOnInit(): void {
     this.recipientForm = this.fb.group({
@@ -27,8 +35,24 @@ export class RecipientComponent implements OnInit {
 
   onSubmit(): void {
     if (this.recipientForm.valid) {
-      console.log('Recipient Data:', this.recipientForm.value);
-      this.router.navigate(['/pago']);
+      this.orderBuilderService.setRecipientData(this.recipientForm.value);
+
+      const assembledOrderData = this.orderBuilderService.assembleOrder();
+
+      // Placeholder for client_id, assuming it's available elsewhere or fixed for now
+      // A more robust solution would get client_id from user login or selection
+      const finalOrder: Partial<Order> = assembledOrderData;
+
+      this.ordersService.createOrder(finalOrder).subscribe({
+        next: (newOrder) => {
+          this.orderBuilderService.resetOrderData(); // Clear collected data
+          this.router.navigate(['/pago'], { state: { order: newOrder } });
+        },
+        error: (err) => {
+          console.error('Error creating order:', err);
+          alert('Error al crear el pedido. Por favor, inténtalo de nuevo.');
+        }
+      });
     } else {
       this.recipientForm.markAllAsTouched();
     }

@@ -1,26 +1,31 @@
 <div class="orders-container">
   <h2>Gestión de Pedidos</h2>
 
-  <!-- Filter Section -->
+  <!-- Filtros -->
   <div class="filter-section">
     <form [formGroup]="filterForm" class="form-inline">
-      <div class="form-group">
-        <input type="text" formControlName="searchTerm" class="form-control" placeholder="Buscar por ID de pedido o cliente...">
+      <div class="form-group me-2">
+        <input 
+          type="text" 
+          formControlName="searchTerm" 
+          class="form-control" 
+          placeholder="Buscar por ID de pedido o cliente..."
+        >
       </div>
+
       <div class="form-group">
         <select formControlName="status" class="form-control">
-          <option value="all">Todos los Estados</option>
           <option value="pending">Pendiente</option>
-          <option value="in_transit">En Camino</option>
-          <option value="delivered">Entregado</option>
-          <option value="picked_up">Recogido</option>
+          <option value="in_progress">En Camino</option>
+          <option value="completed">Entregado</option>
+
         </select>
       </div>
     </form>
   </div>
 
-  <!-- Orders Table -->
-  <div class="table-responsive">
+  <!-- Tabla de pedidos -->
+  <div class="table-responsive mt-3">
     <table class="table table-hover">
       <thead>
         <tr>
@@ -29,79 +34,129 @@
           <th>Fecha Entrega</th>
           <th>Total</th>
           <th>Estado</th>
-          <th>Estado Pago</th>
+          <th>Pago</th>
           <th>Acciones</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let order of filteredOrders">
-          <td>{{ order.id }}</td>
+          <td>{{ order.id! }}</td>
           <td>{{ order.client_id }}</td>
           <td>{{ order.delivery_date | date:'dd/MM/yyyy' }}</td>
           <td>{{ order.total_amount | currency }}</td>
+
           <td>
-            <span class="badge" [ngClass]="{
-              'badge-warning': order.status === 'pending',
-              'badge-info': order.status === 'in_transit',
-              'badge-success': order.status === 'delivered',
-              'badge-secondary': order.status === 'picked_up'
-            }">{{ order.status }}</span>
+            <span class="badge"
+              [ngClass]="{
+                'badge-warning': getNormalizedStatus(order.status) === 'pending',
+                'badge-info': getNormalizedStatus(order.status) === 'in_progress',
+                'badge-success': getNormalizedStatus(order.status) === 'completed'
+              }"
+            >
+              {{ getStatusInSpanish(order.status) }}
+            </span>
           </td>
+
           <td>
-            <span class="badge" [ngClass]="{'badge-danger': order.payment_status === 'pending', 'badge-success': order.payment_status === 'paid'}">
+            <span class="badge"
+              [ngClass]="{
+                'badge-danger': order.payment_status === 'pending',
+                'badge-success': order.payment_status === 'paid'
+              }"
+            >
               {{ order.payment_status }}
             </span>
           </td>
+
           <td>
-            <button class="btn btn-sm btn-primary" (click)="openModal(editModal, order)">Editar</button>
+            <button class="btn btn-sm btn-primary me-1" (click)="openModal(editModal, order)">Editar</button>
             <button class="btn btn-sm btn-danger" (click)="deleteOrder(order.id!)">Borrar</button>
           </td>
         </tr>
-        <tr *ngIf="!filteredOrders || filteredOrders.length === 0">
-          <td colspan="7" class="text-center">No se encontraron pedidos con los filtros actuales.</td>
+
+        <tr *ngIf="filteredOrders.length === 0">
+          <td colspan="7" class="text-center text-muted">No se encontraron pedidos.</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Modal for Editing Order -->
+<!-- MODAL -->
 <ng-template #editModal>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">{{ isEditMode ? 'Editar Pedido' : 'Crear Pedido' }}</h4>
-    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
-      <span aria-hidden="true" class="visually-hidden">&times;</span>
-    </button>
+    <h4 class="modal-title">
+      {{ isEditMode ? 'Editar Pedido' : 'Crear Pedido' }}
+    </h4>
+    <button class="btn-close" (click)="modalRef?.hide()"></button>
   </div>
+
   <div class="modal-body">
     <form [formGroup]="orderForm">
-      <div class="form-group">
-        <label for="client_id">ID Cliente</label>
-        <input type="number" id="client_id" class="form-control" formControlName="client_id" [class.is-invalid]="orderForm.get('client_id')?.invalid && orderForm.get('client_id')?.touched">
+
+      <div class="form-group mb-3">
+        <label>ID Cliente</label>
+        <input type="number" class="form-control" formControlName="client_id">
       </div>
-      <div class="form-group">
-        <label for="delivery_date">Fecha de Entrega</label>
-        <input type="text" id="delivery_date" class="form-.control" bsDatepicker formControlName="delivery_date" [class.is-invalid]="orderForm.get('delivery_date')?.invalid && orderForm.get('delivery_date')?.touched">
+
+      <div class="form-group mb-3">
+        <label>ID Arreglo</label>
+        <input type="number" class="form-control" formControlName="arrangement_id">
       </div>
-      <div class="form-group">
-        <label for="total_amount">Monto Total</label>
-        <input type="number" id="total_amount" class="form-control" formControlName="total_amount" [class.is-invalid]="orderForm.get('total_amount')?.invalid && orderForm.get('total_amount')?.touched">
+
+      <div class="form-group mb-3">
+        <label>Fecha Entrega</label>
+        <input type="text" class="form-control" bsDatepicker formControlName="delivery_date">
       </div>
-      <div class="form-group">
-        <label for="status">Estado del Pedido</label>
-        <select id="status" class="form-control" formControlName="status" [class.is-invalid]="orderForm.get('status')?.invalid && orderForm.get('status')?.touched">
+
+      <div class="form-group mb-3">
+        <label>Total</label>
+        <input type="number" class="form-control" formControlName="total_amount">
+      </div>
+
+      <div class="form-group mb-3">
+        <label>Estado</label>
+        <select class="form-control" formControlName="status">
           <option value="pending">Pendiente</option>
-          <option value="in_transit">En Camino</option>
-          <option value="delivered">Entregado</option>
-          <option value="picked_up">Recogido</option>
+          <option value="in_progress">En Camino</option>
+          <option value="completed">Entregado</option>
         </select>
       </div>
-      <div class="form-group">
-        <label for="payment_status">Estado del Pago</label>
-        <select id="payment_status" class="form-control" formControlName="payment_status" [class.is-invalid]="orderForm.get('payment_status')?.invalid && orderForm.get('payment_status')?.touched">
+
+      <div class="form-group mb-3">
+        <label>Pago</label>
+        <select class="form-control" formControlName="payment_status">
           <option value="pending">Pendiente</option>
           <option value="paid">Pagado</option>
         </select>
       </div>
+
+      <div class="form-group mb-3">
+        <label>Nombre del destinatario</label>
+        <input type="text" class="form-control" formControlName="recipient_name">
+      </div>
+
+      <div class="form-group mb-3">
+        <label>Teléfono del destinatario</label>
+        <input type="text" class="form-control" formControlName="recipient_phone">
+      </div>
+
+      <div class="form-group mb-3">
+        <label>Dirección del destinatario</label>
+        <input type="text" class="form-control" formControlName="recipient_address">
+      </div>
+
+      <div class="form-group mb-3">
+        <label>Notas</label>
+        <textarea class="form-control" formControlName="notes"></textarea>
+      </div>
+
     </form>
   </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" (click)="saveOrder()">Guardar</button>
+    <button class="btn btn-secondary" (click)="modalRef?.hide()">Cancelar</button>
+  </div>
+</ng-template>

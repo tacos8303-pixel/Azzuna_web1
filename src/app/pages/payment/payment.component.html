@@ -1,15 +1,22 @@
 <div class="payment-container">
   <h2>Confirmación y Pago</h2>
 
-  <div class="order-summary card">
+  <div class="order-summary card" *ngIf="currentOrder">
     <div class="card-body">
-      <h5 class="card-title">Resumen del Pedido</h5>
-      <p><strong>Arreglo:</strong> {{ orderSummary.arrangementDetails }}</p>
-      <p><strong>Entrega:</strong> {{ orderSummary.deliveryInfo }}</p>
-      <p><strong>Destinatario:</strong> {{ orderSummary.recipientInfo }}</p>
+      <h5 class="card-title">Resumen del Pedido #{{ currentOrder.id }}</h5>
+      <p><strong>ID Cliente:</strong> {{ currentOrder.client_id }}</p>
+      <p><strong>ID Arreglo:</strong> {{ currentOrder.arrangement_id }}</p>
+      <p><strong>Fecha de Entrega:</strong> {{ currentOrder.delivery_date | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Destinatario:</strong> {{ currentOrder.recipient_name }}</p>
+      <p><strong>Teléfono Destinatario:</strong> {{ currentOrder.recipient_phone }}</p>
+      <p><strong>Dirección Destinatario:</strong> {{ currentOrder.recipient_address }}</p>
+      <p *ngIf="currentOrder.notes"><strong>Notas:</strong> {{ currentOrder.notes }}</p>
       <hr>
-      <h4>Total a Pagar: <span class="total-amount">${{ orderSummary.total }}</span></h4>
+      <h4>Total a Pagar: <span class="total-amount">${{ currentOrder.total_amount }}</span></h4>
     </div>
+  </div>
+  <div *ngIf="!currentOrder" class="alert alert-warning">
+    No se encontró información del pedido. Por favor, realiza un pedido primero.
   </div>
 
   <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">

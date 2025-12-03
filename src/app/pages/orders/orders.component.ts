@@ -1,11 +1,11 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { OrdersService } from '../../core/services/orders.service';
-import { Order } from '../../core/models/order.model';
 import { BsModalService, BsModalRef, ModalModule } from 'ngx-bootstrap/modal';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { Order, OrderStatus } from '../../core/models/order.model';
 
 @Component({
   selector: 'app-orders',
@@ -15,9 +15,44 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
   imports: [CommonModule, ReactiveFormsModule, RouterModule, BsDatepickerModule, ModalModule]
 })
 export class OrdersComponent implements OnInit {
+
+  // Helper to normalize status for ngClass and get Spanish display
+  // This helps handle potential inconsistencies in data where status might be in Spanish
+  getNormalizedStatus(status: string | OrderStatus): OrderStatus {
+    switch (status) {
+      case 'pendiente':
+      case 'pending':
+        return 'pending';
+      case 'en_camino':
+      case 'in_progress':
+        return 'in_progress';
+      case 'entregado':
+      case 'completed':
+        return 'completed';
+      default:
+        // Default to 'pending' if an unknown status is encountered
+        return 'pending';
+    }
+  }
+
+  // Update getStatusInSpanish to use the normalized status for display
+  getStatusInSpanish(status: string | OrderStatus): string {
+    const normalizedStatus = this.getNormalizedStatus(status);
+    switch (normalizedStatus) {
+      case 'pending':
+        return 'Pendiente';
+      case 'in_progress':
+        return 'En Camino';
+      case 'completed':
+        return 'Entregado';
+      default:
+        return String(status); // Fallback, though getNormalizedStatus should prevent this
+    }
+  }
+
   orders: Order[] = [];
   filteredOrders: Order[] = [];
-  
+
   modalRef?: BsModalRef;
   orderForm!: FormGroup;
   isEditMode = false;
@@ -28,7 +63,8 @@ export class OrdersComponent implements OnInit {
   constructor(
     private ordersService: OrdersService,
     private modalService: BsModalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +72,6 @@ export class OrdersComponent implements OnInit {
     this.initOrderForm();
     this.loadOrders();
 
-    // Listen for filter changes
     this.filterForm.valueChanges.subscribe(() => this.applyFilters());
   }
 
@@ -46,57 +81,58 @@ export class OrdersComponent implements OnInit {
       status: ['all'],
     });
   }
-  
+
   initOrderForm(order?: Order): void {
     this.isEditMode = !!order;
     this.currentOrderId = order?.id;
-    // This form is for the modal, pre-populating fields for editing.
+
     this.orderForm = this.fb.group({
-      id: [order?.id],
-      client_id: [order?.client_id, Validators.required],
-      delivery_date: [order ? new Date(order.delivery_date) : null, Validators.required], // Assuming date string from backend
-      total_amount: [order?.total_amount, Validators.required],
-      status: [order?.status, Validators.required],
-      payment_status: [order?.payment_status, Validators.required],
-      // For a real full CRUD, you would include all Order fields
-      // and potentially fetch related data (like client names).
+      client_id: [order?.client_id ?? null, Validators.required],
+      arrangement_id: [order?.arrangement_id ?? null, Validators.required],
+      delivery_date: [order ? new Date(order.delivery_date) : null, Validators.required],
+      total_amount: [order?.total_amount ?? null, Validators.required],
+      status: [order?.status ?? 'pending', Validators.required],
+      payment_status: [order?.payment_status ?? 'pending', Validators.required],
+      recipient_name: [order?.recipient_name ?? '', Validators.required],
+      recipient_phone: [order?.recipient_phone ?? '', Validators.required],
+      recipient_address: [order?.recipient_address ?? '', Validators.required],
+      notes: [order?.notes ?? '']
     });
   }
 
-  loadOrders(): void {
-    this.ordersService.getOrders().subscribe({
-      next: (data: Order[]) => {
-        this.orders = data;
-        this.applyFilters(); // Apply initial filters
-      },
-      error: (err: any) => console.error('Error fetching orders:', err),
+  loadOrders() {
+    this.ordersService.getOrders().subscribe(data => {
+      this.orders = data;
+      this.applyFilters();
     });
   }
-  
+
   applyFilters(): void {
     const { searchTerm, status } = this.filterForm.value;
-    let tempOrders = [...this.orders];
+    let result = [...this.orders];
 
-    // Filter by status
     if (status !== 'all') {
-      tempOrders = tempOrders.filter(order => order.status === status);
+      result = result.filter(o => o.status === status);
     }
 
-    // Filter by search term (on order ID or client ID)
     if (searchTerm) {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        tempOrders = tempOrders.filter(order => 
-            order.id?.toString().includes(lowerCaseSearchTerm) ||
-            order.client_id.toString().includes(lowerCaseSearchTerm)
-        );
+      const st = searchTerm.toLowerCase();
+      result = result.filter(o =>
+        o.id?.toString().includes(st) ||
+        o.client_id.toString().includes(st)
+      );
     }
 
-    this.filteredOrders = tempOrders;
+    this.filteredOrders = result;
   }
 
   openModal(template: TemplateRef<any>, order?: Order): void {
     this.initOrderForm(order);
     this.modalRef = this.modalService.show(template);
+  }
+
+  formatDate(date: Date): string {
+    return date.toISOString().slice(0, 10);
   }
 
   saveOrder(): void {
@@ -105,30 +141,40 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
-    // We assume all fields from the form make up the order object for the update
-    const orderData: Order = this.orderForm.value;
+    const data: Partial<Order> = {
+      ...this.orderForm.value,
+      delivery_date: this.formatDate(this.orderForm.value.delivery_date)
+    };
 
     if (this.isEditMode && this.currentOrderId) {
-      this.ordersService.updateOrder(this.currentOrderId, orderData).subscribe({
+      this.ordersService.updateOrder(this.currentOrderId, data).subscribe({
         next: () => {
-          this.loadOrders(); // Refresh data
+          this.loadOrders();
           this.modalRef?.hide();
-          // Optionally, add a success notification
         },
-        error: (err: any) => console.error('Error updating order:', err),
+        error: (err) => {
+          console.error('Error updating order:', err);
+          this.loadOrders(); // Reload orders even on error
+        }
+      });
+    } else {
+      this.ordersService.createOrder(data).subscribe({
+        next: () => {
+          this.modalRef?.hide();
+          this.loadOrders();
+        },
+        error: (err) => {
+          console.error('Error creating order:', err);
+          this.loadOrders(); // Reload orders even on error
+        }
       });
     }
   }
 
-  deleteOrder(id: number): void {
-    if (confirm('¿Estás seguro de que quieres eliminar este pedido?')) {
-      this.ordersService.deleteOrder(id).subscribe({
-        next: () => {
-          this.loadOrders(); // Refresh data
-          // Optionally, add a success notification
-        },
-        error: (err: any) => console.error('Error deleting order:', err),
-      });
-    }
+  deleteOrder(id: number) {
+    if (!id) return;
+    this.ordersService.deleteOrder(id).subscribe(() => {
+      this.loadOrders();
+    });
   }
 }

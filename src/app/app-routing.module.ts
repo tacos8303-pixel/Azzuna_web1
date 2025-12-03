@@ -8,7 +8,6 @@ import { RecipientComponent } from './pages/recipient/recipient.component';
 import { PaymentComponent } from './pages/payment/payment.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrdersComponent } from './pages/orders/orders.component';
-import { PickupsComponent } from './pages/pickups/pickups.component';
 
 const routes: Routes = [
   { path: 'crear-arreglo', component: CreateArrangementComponent },
@@ -17,7 +16,6 @@ const routes: Routes = [
   { path: 'pago', component: PaymentComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'pedidos', component: OrdersComponent },
-  { path: 'por-recoger', component: PickupsComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // Default route
   { path: '**', redirectTo: '/dashboard' } // Wildcard route
 ];

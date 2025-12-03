@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { OrderBuilderService } from '../../core/services/order-builder.service';
 import { BsDatepickerConfig, BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { CommonModule } from '@angular/common';
 
@@ -15,7 +16,7 @@ export class DeliveryComponent implements OnInit {
   deliveryForm!: FormGroup;
   bsConfig?: Partial<BsDatepickerConfig>;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private orderBuilderService: OrderBuilderService) {
     this.bsConfig = Object.assign(
       {},
       { containerClass: 'theme-red', showWeekNumbers: false, dateInputFormat: 'DD/MM/YYYY' }
@@ -37,6 +38,7 @@ export class DeliveryComponent implements OnInit {
   onSubmit(): void {
     if (this.deliveryForm.valid) {
       console.log('Delivery Data:', this.deliveryForm.value);
+      this.orderBuilderService.setDeliveryData(this.deliveryForm.value);
       this.router.navigate(['/destinatario']);
     } else {
       this.deliveryForm.markAllAsTouched();

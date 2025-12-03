@@ -1,6 +1,6 @@
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -18,7 +18,7 @@ import { RecipientComponent } from './pages/recipient/recipient.component';
 import { PaymentComponent } from './pages/payment/payment.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrdersComponent } from './pages/orders/orders.component';
-import { PickupsComponent } from './pages/pickups/pickups.component';
+
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { PickupsComponent } from './pages/pickups/pickups.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
+
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
@@ -38,6 +38,7 @@ import { PickupsComponent } from './pages/pickups/pickups.component';
     AlertModule.forRoot()
   ],
   providers: [
+    provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideClientHydration(withEventReplay())
